@@ -189,9 +189,12 @@ void GranularProcessor::ProcessGranular(
           0.0f, // stereo_spread;
           0.0f, // feedback;
           0.0f, // reverb;
-          0.0f, // freeze;
+          false, // freeze;
           parameters_.capture, // trigger;
-          0.0f // gate;
+          false, // gate;
+          {}, // granular;
+          {}, // spectral;
+          {} // kammerl;
         };
 
         if (resolution() == 8) {

@@ -31,5 +31,9 @@ At the risk of repeating myself: This code is not compatible with other hardware
 - The submodule `stm_audio_bootloader` has been updated to the latest master to work with newer python versions.
 - The custom linker script adds sections for relevant C++ features.
 
+## Auditioning DSP changes in VCV Rack
+
+The [Superparasites Dev plugin](rack/README.md) runs this checkout's DSP in Rack 2.
+
 ## License
 Code (STM32F projects): MIT license.
