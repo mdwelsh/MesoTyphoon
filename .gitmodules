@@ -1,6 +1,7 @@
 [submodule "stm_audio_bootloader"]
 	path = stm_audio_bootloader
-	url = https://github.com/pichenettes/stm-audio-bootloader.git
+	url = git@github.com:mdwelsh/stm-audio-bootloader.git
+	branch = python3
 [submodule "stmlib"]
 	path = stmlib
 	url = https://github.com/mqtthiqs/stmlib.git
