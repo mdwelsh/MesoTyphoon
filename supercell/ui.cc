@@ -139,7 +139,7 @@ void Ui::Poll() {
     mode_alt_menu_ = false;
   }
   // Rate Adjustment of Aux Random -- value updated on release
-  if (processor_->playback_mode() != PLAYBACK_MODE_PENDULUM &&
+  if (!GranularProcessor::uses_envelope_gate(processor_->playback_mode()) &&
       switches_.pressed(SWITCH_CAPTURE) &&
       fabsf(cv_scaler_->pan_pot() - press_pan_pos_) > 0.05f) {
         //noise_freq_ = cv_scaler_->pan_pot();

@@ -69,7 +69,17 @@ PROJECT_CONFIGURATION += --specs=nano.specs
 include stmlib/makefile.inc
 
 # Rule for building the firmware update file
-wav:  $(TARGET_BIN)
-	python stm_audio_bootloader/qpsk/encoder.py \
+FIRMWARE_NAME = MesoParasites
+UPDATE_WAV = $(BUILD_DIR)$(FIRMWARE_NAME)-$(TARGET).wav
+PYTHON ?= python
+
+# The WAV target also supports a clean parallel build.
+$(OBJS) $(DEPS): | $(BUILD_DIR)
+
+.PHONY: wav
+wav: $(UPDATE_WAV)
+
+$(UPDATE_WAV): $(TARGET_BIN) supercell/makefile stm_audio_bootloader/qpsk/encoder.py stm_audio_bootloader/audio_stream_writer.py
+	PYTHONPATH="$(CURDIR)$(if $(PYTHONPATH),:$(PYTHONPATH))" $(PYTHON) stm_audio_bootloader/qpsk/encoder.py \
 		-t stm32f4 -s 48000 -b 12000 -c 6000 -p 256 \
-		$(TARGET_BIN)
+		--output_file "$@" $(TARGET_BIN)

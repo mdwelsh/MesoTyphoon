@@ -161,9 +161,12 @@ class GranularProcessor {
   
   inline PlaybackMode playback_mode() const { return playback_mode_; }
 
+  static bool uses_envelope_gate(PlaybackMode mode) {
+    return mode == PLAYBACK_MODE_ADSR || mode == PLAYBACK_MODE_PENDULUM;
+  }
+
   static bool uses_sample_buffer(PlaybackMode mode) {
-    return mode != PLAYBACK_MODE_ADSR && mode != PLAYBACK_MODE_PENDULUM &&
-        mode != PLAYBACK_MODE_SHOEGAZE;
+    return !uses_envelope_gate(mode) && mode != PLAYBACK_MODE_SHOEGAZE;
   }
   
   inline void set_quality(int32_t quality) {
