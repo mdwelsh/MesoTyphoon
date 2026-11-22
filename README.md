@@ -1,8 +1,18 @@
-Port of Clouds/Parasites/Beat Repeat to Grayscale [Supercell](https://grayscale.info/supercell/) and [Microcell](https://grayscale.info/microcell/) platforms.
+# Superparasites
+
+This repository is a fork of Patrick Dowling’s [Superparasites firmware](https://github.com/patrickdowling/superparasites), which ports Clouds, [Parasites](https://github.com/mqtthiqs/parasites), and [Kammerl Beat Repeat](https://github.com/jkammerl/eurorack) to the Grayscale [Supercell](https://grayscale.info/supercell/) and [Microcell](https://grayscale.info/microcell/) platforms.
 
 Note that this version has platform-specific drivers and a custom linker script and is **not** compatible with other hardware versions of Clouds.
 
-It is based off the [Parasites codebase](https://github.com/mqtthiqs/parasites) and includes nine selectable modes:
+## Changes in this fork
+
+- **ADSR Envelope** replaces Spectral Clouds in firmware slot 8. It applies a gate-controlled envelope to stereo audio. The Spectral Clouds source remains in the repository.
+- **Chaotic Pendulum** adds a monophonic synth voice in firmware slot 9, with V/oct pitch, an ADSR envelope, Chaos Amount, Shape, Fold, and bipolar Animate detuning. The voice shares its DSP implementation with Rack.
+- **Superparasites Dev for VCV Rack 2** adds a Typhoon-inspired panel for auditioning DSP changes. Rack builds directly from this repository’s processor source and exposes Chaotic Pendulum in slot 8. See the [Rack build and usage guide](rack/README.md).
+- **Python 3 WAV encoding** uses the `python3` branch of this fork’s [audio bootloader tools](https://github.com/mdwelsh/stm-audio-bootloader/tree/python3) to generate firmware update WAVs.
+
+## Firmware modes
+
 - Granular
 - Pitch shifter/time stretch
 - Looping delay
@@ -27,8 +37,6 @@ sliders still set attack, decay, sustain, and release. **Mix** is Chaos Amount,
 one semitone down to one semitone up, with zero detune at noon. The voice
 generates its own signal and sends it to both audio outputs.
 
-As far as possible, the commit history has been preserved, for better for worse...
-
 ## Hardware Variants
 Since there is a small hardware difference (inverted pots) there are two possible build targets: Supercell and Microcell
 - To build for Supercell hardware, use `make -f supercell/makefile VARIANT=SUPERCELL ...`. The resulting files are in `build/supercell/`.
@@ -40,10 +48,9 @@ At the risk of repeating myself: This code is not compatible with other hardware
 
 ## Notes
 - (1) The bootloader is the least tested part of this project.
-- Released versions have been compiled using `gcc-arm-none-eabi-5_4-2016q3`
+- Upstream releases were compiled using `gcc-arm-none-eabi-5_4-2016q3`.
 - The stmlib submodule still uses mqtthiqs/stmlib which has diverged somewhat from pichenettes'. This allowed setting of an external linker script out-of-the-box.
 - However, that does mean that the scripts for programming appear to require openocd 0.9.0 so the command line calls may be different to a current version of pichenettes' repo.
-- The submodule `stm_audio_bootloader` has been updated to the latest master to work with newer python versions.
 - The custom linker script adds sections for relevant C++ features.
 
 ## Auditioning DSP changes in VCV Rack
