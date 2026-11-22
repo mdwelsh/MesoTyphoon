@@ -44,6 +44,7 @@
 #include "supercell/dsp/granular_sample_player.h"
 #include "supercell/dsp/kammerl_player.h"
 #include "supercell/dsp/looping_sample_player.h"
+#include "supercell/dsp/pendulum_voice.h"
 #include "supercell/dsp/pvoc/phase_vocoder.h"
 #include "supercell/dsp/sample_rate_converter.h"
 #include "supercell/dsp/wsola_sample_player.h"
@@ -61,6 +62,7 @@ enum PlaybackMode {
   PLAYBACK_MODE_RESONESTOR,
   PLAYBACK_MODE_KAMMERL,
   PLAYBACK_MODE_ADSR,
+  PLAYBACK_MODE_PENDULUM,
   PLAYBACK_MODE_LAST,
   // Kept for development outside the range used by the mode selectors.
   PLAYBACK_MODE_SPECTRAL_CLOUD
@@ -156,6 +158,10 @@ class GranularProcessor {
   }
   
   inline PlaybackMode playback_mode() const { return playback_mode_; }
+
+  static bool uses_sample_buffer(PlaybackMode mode) {
+    return mode != PLAYBACK_MODE_ADSR && mode != PLAYBACK_MODE_PENDULUM;
+  }
   
   inline void set_quality(int32_t quality) {
     set_num_channels(quality & 1 ? 1 : 2);
@@ -201,6 +207,7 @@ class GranularProcessor {
   PlaybackMode playback_mode_;
   PlaybackMode previous_playback_mode_;
   AdsrEnvelope adsr_;
+  PendulumVoice pendulum_;
   int32_t num_channels_;
   bool low_fidelity_;
   

@@ -2,7 +2,7 @@ Port of Clouds/Parasites/Beat Repeat to Grayscale [Supercell](https://grayscale.
 
 Note that this version has platform-specific drivers and a custom linker script and is **not** compatible with other hardware versions of Clouds.
 
-It is based off the [Parasites codebase](https://github.com/mqtthiqs/parasites) and includes eight selectable modes:
+It is based off the [Parasites codebase](https://github.com/mqtthiqs/parasites) and includes nine selectable modes:
 - Granular
 - Pitch shifter/time stretch
 - Looping delay
@@ -11,6 +11,7 @@ It is based off the [Parasites codebase](https://github.com/mqtthiqs/parasites) 
 - Resonestor
 - Beat Repeat
 - ADSR envelope
+- Chaotic Pendulum
 
 In the ADSR mode, patch stereo audio into the audio inputs and a gate into **Trig**.
 Set attack, decay, sustain, and release with **Position**, **Density**, **Size**,
@@ -18,6 +19,13 @@ and **Texture**, respectively. The gate opens the envelope and holds sustain
 until it goes low. Attack, decay, and release range from 1 ms to 10 s with a
 cubic slider taper. Sustain sets the held level from silence to unity gain.
 ADSR occupies the former Spectral Clouds slot (eighth mode, LED pattern ●●●○).
+
+**Chaotic Pendulum** is the ninth mode (●●●●). Patch pitch to **V/oct** and a
+note gate to **Trig**, or hold the manual trigger to audition. The four
+sliders still set attack, decay, sustain, and release. **Mix** is Chaos Amount,
+**Pan** is Shape, **Feedback** is Fold, and **Reverb** is Animate. Animate spans
+one semitone down to one semitone up, with zero detune at noon. The voice
+generates its own signal and sends it to both audio outputs.
 
 As far as possible, the commit history has been preserved, for better for worse...
 

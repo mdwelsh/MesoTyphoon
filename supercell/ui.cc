@@ -139,7 +139,9 @@ void Ui::Poll() {
     mode_alt_menu_ = false;
   }
   // Rate Adjustment of Aux Random -- value updated on release
-  if (switches_.pressed(SWITCH_CAPTURE) && fabsf(cv_scaler_->pan_pot() - press_pan_pos_) > 0.05f) {
+  if (processor_->playback_mode() != PLAYBACK_MODE_PENDULUM &&
+      switches_.pressed(SWITCH_CAPTURE) &&
+      fabsf(cv_scaler_->pan_pot() - press_pan_pos_) > 0.05f) {
         //noise_freq_ = cv_scaler_->pan_pot();
         tracking_noise_ctrl_ = true;
   }
@@ -213,7 +215,9 @@ void Ui::PaintLeds() {
             } else {
               // TODO[pld] This is horribly inefficient, but there might be side-effects to adding a separate case
               uint8_t mode = processor_->playback_mode() & 0x3;
-              if (processor_->playback_mode() < 4) {
+              if (processor_->playback_mode() == PLAYBACK_MODE_PENDULUM) {
+                leds_.set_status(15 - i, fade);
+              } else if (processor_->playback_mode() < 4) {
                 leds_.set_status(15-i, i == mode ? fade : 0);
               } else {
                 leds_.set_status(15-i, i == mode ? 0 : fade);
@@ -359,7 +363,7 @@ void Ui::OnSwitchReleased(const Event& e) {
       }
       break;
     case SWITCH_WRITE:
-      if (processor_->playback_mode() == PLAYBACK_MODE_ADSR) {
+      if (!GranularProcessor::uses_sample_buffer(processor_->playback_mode())) {
         break;
       }
       if (e.data >= kLongPressDuration) {

@@ -92,6 +92,9 @@ void FillBuffer(Codec::Frame* input, Codec::Frame* output, size_t n) {
   TIC
 #endif  // PROFILE_INTERRUPT
   cv_scaler.Read(processor.mutable_parameters());
+  if (processor.playback_mode() == PLAYBACK_MODE_PENDULUM && ui.capture_pressed()) {
+    processor.mutable_parameters()->gate = true;
+  }
   in_meter.Process(input, n); // Process input meter before processing (avoids mutes, etc.)
   processor.Process((ShortFrame*)input, (ShortFrame*)output, n);
   out_meter.Process(output, n);

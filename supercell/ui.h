@@ -91,6 +91,9 @@ class Ui {
   void Poll();
   void DoEvents();
   void FlushEvents();
+  bool capture_pressed() const {
+    return switches_.pressed(SWITCH_CAPTURE);
+  }
   void Panic() {
     mode_ = UI_MODE_PANIC;
   }

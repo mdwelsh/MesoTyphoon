@@ -169,10 +169,11 @@ void CvScaler::Read(Parameters* parameters) {
   CONSTRAIN(output_level, 0.0f, 1.0f);
   output_level_ = (1.0f - output_level);
   
-  parameters->pitch = stmlib::Interpolate(
-      lut_quantized_pitch,
-      smoothed_adc_value_[ADC_CHANNEL_LAST + ADC_PITCH_POTENTIOMETER],
-      1024.0f);
+  const float pitch_pot = smoothed_adc_value_[ADC_CHANNEL_LAST + ADC_PITCH_POTENTIOMETER];
+  const int pitch_table_end = LUT_QUANTIZED_PITCH_SIZE - 1;
+  parameters->pitch = pitch_pot < 1.0f
+      ? stmlib::Interpolate(lut_quantized_pitch, pitch_pot, pitch_table_end)
+      : lut_quantized_pitch[pitch_table_end];
 
   
   float note = calibration_data_->pitch_offset;

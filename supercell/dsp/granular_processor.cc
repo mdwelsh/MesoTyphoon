@@ -339,7 +339,7 @@ void GranularProcessor::Process(
   }
 
   if (silence_ ||
-      (reset_buffers_ && playback_mode_ != PLAYBACK_MODE_ADSR) ||
+      (reset_buffers_ && uses_sample_buffer(playback_mode_)) ||
       previous_playback_mode_ != playback_mode_) {
     short* output_samples = &output[0].l;
     fill(&output_samples[0], &output_samples[size << 1], 0);
@@ -353,6 +353,20 @@ void GranularProcessor::Process(
       const float gain = adsr_.Next();
       output[i].l = static_cast<int16_t>(input[i].l * gain);
       output[i].r = static_cast<int16_t>(input[i].r * gain);
+    }
+    return;
+  }
+
+  if (playback_mode_ == PLAYBACK_MODE_PENDULUM) {
+    const Parameters& p = parameters_;
+    pendulum_.Configure(p.gate, p.pitch, p.position, p.density, p.size,
+        p.texture, p.dry_wet, p.stereo_spread, p.feedback, p.reverb);
+    const float mute_level = mute_out_ ? 0.0f : 1.0f;
+    for (size_t i = 0; i < size; ++i) {
+      mute_out_fade_ += 0.01f * (mute_level - mute_out_fade_);
+      const int16_t sample = Clip16(
+          static_cast<int32_t>(pendulum_.Next() * mute_out_fade_ * 32768.0f));
+      output[i].l = output[i].r = sample;
     }
     return;
   }
@@ -652,14 +666,19 @@ bool GranularProcessor::LoadPersistentData(const uint32_t* data) {
 
 void GranularProcessor::Prepare() {
   bool playback_mode_changed = previous_playback_mode_ != playback_mode_;
-  if (playback_mode_ == PLAYBACK_MODE_ADSR) {
+  if (!uses_sample_buffer(playback_mode_)) {
     if (playback_mode_changed) {
-      adsr_.Reset();
+      if (playback_mode_ == PLAYBACK_MODE_ADSR) {
+        adsr_.Reset();
+      } else {
+        pendulum_.Reset();
+        mute_out_fade_ = mute_out_ ? 0.0f : 1.0f;
+      }
     }
     previous_playback_mode_ = playback_mode_;
     return;
   }
-  if (previous_playback_mode_ == PLAYBACK_MODE_ADSR) {
+  if (!uses_sample_buffer(previous_playback_mode_)) {
     reset_buffers_ = true;
   }
 
