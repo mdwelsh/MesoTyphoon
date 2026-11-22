@@ -2,7 +2,7 @@ Port of Clouds/Parasites/Beat Repeat to Grayscale [Supercell](https://grayscale.
 
 Note that this version has platform-specific drivers and a custom linker script and is **not** compatible with other hardware versions of Clouds.
 
-It is based off the [Parasites codebase](https://github.com/mqtthiqs/parasites) and merges the two modes from [Beat Repeat](https://github.com/jkammerl/eurorack) for a total of eight modes:
+It is based off the [Parasites codebase](https://github.com/mqtthiqs/parasites) and includes eight selectable modes:
 - Granular
 - Pitch shifter/time stretch
 - Looping delay
@@ -10,7 +10,14 @@ It is based off the [Parasites codebase](https://github.com/mqtthiqs/parasites) 
 - Oliverb
 - Resonestor
 - Beat Repeat
-- Spectral clouds
+- ADSR envelope
+
+In the ADSR mode, patch stereo audio into the audio inputs and a gate into **Trig**.
+Set attack, decay, sustain, and release with **Position**, **Density**, **Size**,
+and **Texture**, respectively. The gate opens the envelope and holds sustain
+until it goes low. Attack, decay, and release range from 1 ms to 10 s with a
+cubic slider taper. Sustain sets the held level from silence to unity gain.
+ADSR occupies the former Spectral Clouds slot (eighth mode, LED pattern ●●●○).
 
 As far as possible, the commit history has been preserved, for better for worse...
 

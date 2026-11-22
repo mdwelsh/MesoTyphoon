@@ -52,6 +52,7 @@ void GranularProcessor::Init(
 
   num_channels_ = 2;
   low_fidelity_ = false;
+  silence_ = false;
   bypass_ = false;
 
   src_down_.Init();
@@ -337,10 +338,22 @@ void GranularProcessor::Process(
     return;
   }
 
-  if (silence_ || reset_buffers_ ||
+  if (silence_ ||
+      (reset_buffers_ && playback_mode_ != PLAYBACK_MODE_ADSR) ||
       previous_playback_mode_ != playback_mode_) {
     short* output_samples = &output[0].l;
     fill(&output_samples[0], &output_samples[size << 1], 0);
+    return;
+  }
+
+  if (playback_mode_ == PLAYBACK_MODE_ADSR) {
+    adsr_.Configure(parameters_.gate, parameters_.position,
+        parameters_.density, parameters_.size, parameters_.texture);
+    for (size_t i = 0; i < size; ++i) {
+      const float gain = adsr_.Next();
+      output[i].l = static_cast<int16_t>(input[i].l * gain);
+      output[i].r = static_cast<int16_t>(input[i].r * gain);
+    }
     return;
   }
 
@@ -604,6 +617,11 @@ bool GranularProcessor::LoadPersistentData(const uint32_t* data) {
           playback_mode_ == PLAYBACK_MODE_SPECTRAL_CLOUD
           ? playback_mode_ : 0;
       uint8_t requires_spectral = persistent_state_.spectral;
+      // The former Spectral Clouds bank format cannot be used by ADSR.
+      if (requires_spectral != 0 && requires_spectral != PLAYBACK_MODE_SPECTRAL) {
+        silence_ = false;
+        return false;
+      }
       if (currently_spectral ^ requires_spectral) {
         set_playback_mode(requires_spectral
             ? static_cast<PlaybackMode>(requires_spectral)
@@ -634,6 +652,17 @@ bool GranularProcessor::LoadPersistentData(const uint32_t* data) {
 
 void GranularProcessor::Prepare() {
   bool playback_mode_changed = previous_playback_mode_ != playback_mode_;
+  if (playback_mode_ == PLAYBACK_MODE_ADSR) {
+    if (playback_mode_changed) {
+      adsr_.Reset();
+    }
+    previous_playback_mode_ = playback_mode_;
+    return;
+  }
+  if (previous_playback_mode_ == PLAYBACK_MODE_ADSR) {
+    reset_buffers_ = true;
+  }
+
   bool benign_change = playback_mode_ != PLAYBACK_MODE_SPECTRAL
     && previous_playback_mode_ != PLAYBACK_MODE_SPECTRAL
     && playback_mode_ != PLAYBACK_MODE_SPECTRAL_CLOUD

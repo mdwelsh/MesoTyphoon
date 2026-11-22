@@ -359,6 +359,9 @@ void Ui::OnSwitchReleased(const Event& e) {
       }
       break;
     case SWITCH_WRITE:
+      if (processor_->playback_mode() == PLAYBACK_MODE_ADSR) {
+        break;
+      }
       if (e.data >= kLongPressDuration) {
         if (save_alt_menu_) {
             mode_ = UI_MODE_VU_METER; // Return to main UI

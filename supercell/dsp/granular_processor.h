@@ -32,6 +32,7 @@
 #include "stmlib/stmlib.h"
 #include "stmlib/dsp/filter.h"
 
+#include "supercell/dsp/adsr_envelope.h"
 #include "supercell/dsp/correlator.h"
 #include "supercell/dsp/frame.h"
 #include "supercell/dsp/fx/diffuser.h"
@@ -59,8 +60,10 @@ enum PlaybackMode {
   PLAYBACK_MODE_OLIVERB,
   PLAYBACK_MODE_RESONESTOR,
   PLAYBACK_MODE_KAMMERL,
-  PLAYBACK_MODE_SPECTRAL_CLOUD,
-  PLAYBACK_MODE_LAST
+  PLAYBACK_MODE_ADSR,
+  PLAYBACK_MODE_LAST,
+  // Kept for development outside the range used by the mode selectors.
+  PLAYBACK_MODE_SPECTRAL_CLOUD
 };
 
 // State of the recording buffer as saved in one of the 4 sample memories.
@@ -197,6 +200,7 @@ class GranularProcessor {
 
   PlaybackMode playback_mode_;
   PlaybackMode previous_playback_mode_;
+  AdsrEnvelope adsr_;
   int32_t num_channels_;
   bool low_fidelity_;
   
