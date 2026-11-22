@@ -7,6 +7,7 @@ Note that this version has platform-specific drivers and a custom linker script 
 ## Changes in this fork
 
 - **ADSR Envelope** replaces Spectral Clouds in firmware slot 8. It applies a gate-controlled envelope to stereo audio. The Spectral Clouds source remains in the repository.
+- **Shoegaze** replaces Beat Repeat in slot 7. It processes stereo audio through a pre-reverb, fuzz with a tone control, and a post-reverb. Each reverb has its own mix and decay controls. The Beat Repeat source remains in the repository.
 - **Chaotic Pendulum** adds a monophonic synth voice in firmware slot 9, with V/oct pitch, an ADSR envelope, Chaos Amount, Shape, Fold, and bipolar Animate detuning. The voice shares its DSP implementation with Rack.
 - **Superparasites Dev for VCV Rack 2** adds a Typhoon-inspired panel for auditioning DSP changes. Rack builds directly from this repository’s processor source and exposes Chaotic Pendulum in slot 8. See the [Rack build and usage guide](rack/README.md).
 - **Python 3 WAV encoding** uses the `python3` branch of this fork’s [audio bootloader tools](https://github.com/mdwelsh/stm-audio-bootloader/tree/python3) to generate firmware update WAVs.
@@ -19,9 +20,18 @@ Note that this version has platform-specific drivers and a custom linker script 
 - Spectral madness
 - Oliverb
 - Resonestor
-- Beat Repeat
+- Shoegaze
 - ADSR envelope
 - Chaotic Pendulum
+
+**Shoegaze** is the seventh mode (●●○●). Patch audio into **In L/R**. The
+**Position** and **Density** sliders set pre- and post-reverb decay, respectively.
+**Size** and **Texture** set fuzz amount and tone, from dark to bright. The
+**Mix** and **Pan** knobs set pre- and post-reverb mix. **Feedback** feeds the
+post-reverb tail back into the fuzz. **Reverb** sets post-reverb modulation depth.
+Save any recording you want to keep before switching to Shoegaze, which
+uses the recording RAM for its two
+reverb tails.
 
 In the ADSR mode, patch stereo audio into the audio inputs and a gate into **Trig**.
 Set attack, decay, sustain, and release with **Position**, **Density**, **Size**,

@@ -371,6 +371,27 @@ void GranularProcessor::Process(
     return;
   }
 
+  if (playback_mode_ == PLAYBACK_MODE_SHOEGAZE) {
+    const float input_level = mute_in_ ? 0.0f : 1.0f;
+    for (size_t i = 0; i < size; ++i) {
+      mute_in_fade_ += 0.01f * (input_level - mute_in_fade_);
+      const float scale = mute_in_fade_ / 32768.0f;
+      in_[i].l = input[i].l * scale;
+      in_[i].r = input[i].r * scale;
+    }
+    const Parameters& p = parameters_;
+    shoegaze_.Process(in_, size, p.dry_wet, p.position, p.size, p.texture,
+        p.stereo_spread, p.density, p.feedback, p.reverb);
+    const float output_level = mute_out_ ? 0.0f : 1.0f;
+    for (size_t i = 0; i < size; ++i) {
+      mute_out_fade_ += 0.01f * (output_level - mute_out_fade_);
+      const float scale = mute_out_fade_ * 32768.0f;
+      output[i].l = Clip16(static_cast<int32_t>(in_[i].l * scale));
+      output[i].r = Clip16(static_cast<int32_t>(in_[i].r * scale));
+    }
+    return;
+  }
+
   // Convert input buffers to float, and mixdown for mono processing.
   // SUPERCELL Handle Mute In separately
   // TODO[pld] These loops look inefficient, we should be able to avoid unnecesary float/short conversions
@@ -670,8 +691,14 @@ void GranularProcessor::Prepare() {
     if (playback_mode_changed) {
       if (playback_mode_ == PLAYBACK_MODE_ADSR) {
         adsr_.Reset();
-      } else {
+      } else if (playback_mode_ == PLAYBACK_MODE_PENDULUM) {
         pendulum_.Reset();
+        mute_out_fade_ = mute_out_ ? 0.0f : 1.0f;
+      } else {
+        // Each reverb uses 32 KiB from one of the two recording buffers.
+        shoegaze_.Init(static_cast<uint16_t*>(buffer_[0]),
+            static_cast<uint16_t*>(buffer_[1]));
+        mute_in_fade_ = mute_in_ ? 0.0f : 1.0f;
         mute_out_fade_ = mute_out_ ? 0.0f : 1.0f;
       }
     }

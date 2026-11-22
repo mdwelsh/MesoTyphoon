@@ -40,12 +40,14 @@ class Reverb {
   Reverb() { }
   ~Reverb() { }
 
-  void Init(uint16_t* buffer) {
+  void Init(uint16_t* buffer, float modulation_rate = 1.0f) {
     engine_.Init(buffer);
-    engine_.SetLFOFrequency(LFO_1, 0.5f / 32000.0f);
-    engine_.SetLFOFrequency(LFO_2, 0.3f / 32000.0f);
+    engine_.SetLFOFrequency(LFO_1, 0.5f * modulation_rate / 32000.0f);
+    engine_.SetLFOFrequency(LFO_2, 0.3f * modulation_rate / 32000.0f);
+    modulation_depth_ = 1.0f;
     lp_ = 0.7f;
     diffusion_ = 0.625f;
+    lp_decay_1_ = lp_decay_2_ = 0.0f;
   }
 
   void Process(FloatFrame* in_out, size_t size) {
@@ -80,6 +82,8 @@ class Reverb {
     const float krt = reverb_time_;
     const float amount = amount_;
     const float gain = input_gain_;
+    const float diffuser_modulation = 60.0f * modulation_depth_;
+    const float tank_modulation = 100.0f * modulation_depth_;
 
     float lp_1 = lp_decay_1_;
     float lp_2 = lp_decay_2_;
@@ -90,7 +94,7 @@ class Reverb {
       engine_.Start(&c);
 
       // Smear AP1 inside the loop.
-      c.Interpolate(ap1, 10.0f, LFO_1, 60.0f, 1.0f);
+      c.Interpolate(ap1, 10.0f, LFO_1, diffuser_modulation, 1.0f);
       c.Write(ap1, 100, 0.0f);
 
       c.Read(in_out->l + in_out->r, gain);
@@ -108,7 +112,7 @@ class Reverb {
 
       // Main reverb loop.
       c.Load(apout);
-      c.Interpolate(del2, 4680.0f, LFO_2, 100.0f, krt);
+      c.Interpolate(del2, 4680.0f, LFO_2, tank_modulation, krt);
       c.Lp(lp_1, klp);
       c.Read(dap1a TAIL, -kap);
       c.WriteAllPass(dap1a, kap);
@@ -159,6 +163,10 @@ class Reverb {
     lp_ = lp;
   }
 
+  inline void set_modulation_depth(float depth) {
+    modulation_depth_ = depth;
+  }
+
  private:
   typedef FxEngine<16384, FORMAT_12_BIT> E;
   E engine_;
@@ -167,6 +175,7 @@ class Reverb {
   float input_gain_;
   float reverb_time_;
   float diffusion_;
+  float modulation_depth_;
   float lp_;
 
   float lp_decay_1_;

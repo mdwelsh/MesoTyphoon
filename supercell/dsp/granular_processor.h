@@ -38,6 +38,7 @@
 #include "supercell/dsp/fx/diffuser.h"
 #include "supercell/dsp/fx/pitch_shifter.h"
 #include "supercell/dsp/fx/reverb.h"
+#include "supercell/dsp/fx/shoegaze.h"
 #include "supercell/dsp/resonestor.h"
 #include "supercell/dsp/fx/oliverb.h"
 #include "supercell/dsp/granular_processor.h"
@@ -60,12 +61,13 @@ enum PlaybackMode {
   PLAYBACK_MODE_SPECTRAL,
   PLAYBACK_MODE_OLIVERB,
   PLAYBACK_MODE_RESONESTOR,
-  PLAYBACK_MODE_KAMMERL,
+  PLAYBACK_MODE_SHOEGAZE,
   PLAYBACK_MODE_ADSR,
   PLAYBACK_MODE_PENDULUM,
   PLAYBACK_MODE_LAST,
   // Kept for development outside the range used by the mode selectors.
-  PLAYBACK_MODE_SPECTRAL_CLOUD
+  PLAYBACK_MODE_SPECTRAL_CLOUD,
+  PLAYBACK_MODE_KAMMERL
 };
 
 // State of the recording buffer as saved in one of the 4 sample memories.
@@ -160,7 +162,8 @@ class GranularProcessor {
   inline PlaybackMode playback_mode() const { return playback_mode_; }
 
   static bool uses_sample_buffer(PlaybackMode mode) {
-    return mode != PLAYBACK_MODE_ADSR && mode != PLAYBACK_MODE_PENDULUM;
+    return mode != PLAYBACK_MODE_ADSR && mode != PLAYBACK_MODE_PENDULUM &&
+        mode != PLAYBACK_MODE_SHOEGAZE;
   }
   
   inline void set_quality(int32_t quality) {
@@ -208,6 +211,7 @@ class GranularProcessor {
   PlaybackMode previous_playback_mode_;
   AdsrEnvelope adsr_;
   PendulumVoice pendulum_;
+  Shoegaze shoegaze_;
   int32_t num_channels_;
   bool low_fidelity_;
   
