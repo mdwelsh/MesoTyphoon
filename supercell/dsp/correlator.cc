@@ -38,6 +38,9 @@ void Correlator::Init(uint32_t* source, uint32_t* destination) {
   source_ = source;
   destination_ = destination;
   offset_ = 0;
+  increment_ = 0;
+  size_ = 0;
+  candidate_ = 0;
   best_match_ = 0;
   done_ = true;
 }

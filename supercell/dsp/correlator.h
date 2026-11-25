@@ -49,8 +49,8 @@ class Correlator {
   }
 
   inline void EvaluateSomeCandidates() {
-    size_t num_candidates = (size_ >> 2) + 16;
-    while (num_candidates) {
+    int32_t num_candidates = (size_ >> 2) + 16;
+    while (!done_ && num_candidates > 0) {
       EvaluateNextCandidate();
       --num_candidates;
     }
